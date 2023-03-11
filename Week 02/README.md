@@ -1,3 +1,8 @@
+### **Теория и примери от семинар**
+
+- text_files_in_c++.cpp
+- shop.informatika
+- test.txt
 
 ### **Task 1**
 
