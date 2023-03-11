@@ -3,8 +3,6 @@
 
 int main()
 {
-	//	Напишете програма, която отпечатва на екрана собствения си код.
-
 	std::fstream program("Week2.cpp", std::ios::in);
 
 	if (!program.is_open())
