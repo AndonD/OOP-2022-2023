@@ -1,0 +1,7 @@
+apple
+pear
+computer
+water
+car
+hello
+world
