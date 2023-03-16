@@ -1,8 +1,5 @@
-#pragma warning(disable:4996)
-
 #include <iostream>
 #include <fstream>
-#include <errno.h>
 
 const char* ERROR_MESSAGE = "Couldn't open file correctly\n";
 
