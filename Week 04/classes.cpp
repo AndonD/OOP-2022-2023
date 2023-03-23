@@ -38,7 +38,7 @@ public:
 
 	Address address;
 
-	void function()
+	void function()		// here we have access to egn, although it is private; that's because we are referring it in the same class
 	{
 		egn = 5;
 	}
@@ -50,6 +50,8 @@ int main()
 	Address address{ arr, arr, 45 };	// we can use this constructor only for public members
 
 	Person* pesho = new Person;
+
+	pesho.function();		// works because function is public and we do not access the egn property directly, now egn = 5
 	pesho->age = 14;
 	pesho->address = address;
 
