@@ -7,6 +7,30 @@ const char* ERROR_MESSAGE = "Couldn't open file correctly\n";
 
 struct Product
 {
+	char name[10];
+	size_t quantity;
+	float price;
+
+	void print()
+	{
+		std::cout << name << std::endl;
+		std::cout << quantity << std::endl;
+		std::cout << price << std::endl;
+	}
+};
+
+
+// The struct below shows an example of frequently made mistake, relating to the "name" data member:
+// When the name is represented by a pointer to char (char*) and we try to write it binary, we will write only the pointer.
+// This means that it is not written as a char array, because the type is strict (char*, but not char[]).
+// 
+// If you want to write the char array, there are two possible ways to do it:
+// 1. you use statically allocated array as the struct Product above
+// 2. you use dynamically allocated array (will be discussed next week), but you must pay attention to exactly how many characters you'll try to write
+//
+
+struct Product_Wrong_Example
+{
 	char* name;
 	size_t quantity;
 	float price;
@@ -18,6 +42,7 @@ struct Product
 		std::cout << price << std::endl;
 	}
 };
+
 
 
 int main()
@@ -32,18 +57,23 @@ int main()
 		return -1;
 	}
 
-	char name[] = "apple";
-	Product product{ name, 5, 2.45 };
+	char name[10] = "apple";
+	Product product;
+
+	// initializing the product
+	strcpy(product.name, name);
+	product.quantity = 5;
+	product.price = 2.45;
 
 
 	// Syntax for binary writing is:
 	// fstreamName.write(<the object/variable to write into the file, casted to const char*>, <how many bytes we want to write into the file>)
-	
+
 	// Every type of information in the computer is represented with zeros (0) and ones (1).
 	// It is the same when we try to use binary files - every object/variable we write is written in bytes.
 	// For example, if we want to write an integer, 4 bytes will be written, and it will be the binary representation of the decimal integer.
 	// Chars are represented by the binary form of their ASCII code.
-	
+
 	// NOTE that arrays and structures are fully written even if we do not use some of the allocated bytes.
 	// For example if there is an array with 10 elements, but we only initialized 5 of them, 10 will be written.
 	// In the case of writing a structure into binary file, we also write the bytes, used for the padding of the structure memory
@@ -64,7 +94,6 @@ int main()
 	product2.print();
 
 	binary.close();
-
 
 	return 0;
 }
