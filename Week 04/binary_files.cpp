@@ -147,6 +147,8 @@ int main()
 		// file stream error handling
 	}
 
+	delete[] dynamic.name;	// free the memory used by "dynamic"
+
 	// Reading
 	Product_With_Dynamic_Array toRead;
 	binary.read((char*)&nameLength, sizeof(nameLength));
@@ -163,6 +165,7 @@ int main()
 	}
 
 	toRead.print();
+	delete[] toRead.name;	// free the memory used by "toRead"
 
 	binary.close();
 
