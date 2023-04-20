@@ -15,7 +15,13 @@ private:
 
 public:
 
-	String() : size(0), capacity(8), str(new char[capacity]) {}
+	String()
+	{
+		this->size = 0;
+		this->capacity = 8;
+		this->str = new char[capacity];
+		this->str[0] = '\0';
+	}
 
 	String(const char* content)
 	{

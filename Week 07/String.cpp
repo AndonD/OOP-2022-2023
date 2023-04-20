@@ -6,6 +6,13 @@
 #include "String.h"
 
 String::String() : size(0), capacity(8), str(new char[capacity]) {}
+String::String()
+{
+	this->size = 0;
+	this->capacity = 8;
+	this->str = new char[capacity];
+	this->str[0] = '\0';
+}
 
 String::String(const char* content)
 {
