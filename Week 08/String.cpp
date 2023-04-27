@@ -136,39 +136,7 @@ String& String::operator+=(const String& other)
 	return *this;
 }
 
-String& String::operator+=(const char& c)
-{
-	char* temp = new char[this->size + 1 + 1];	// +1 for the char and +1 for the terminating null
-	strcpy(temp, this->str);
-	temp[this->size] = c;
-	temp[this->size + 1] = '\0';
-
-	*this = String(temp);
-	delete[] temp;
-
-	return *this;
-}
-
 void String::print() const
 {
 	std::cout << str << std::endl;
-}
-
-// friend operators
-
-std::ostream& operator<< (std::ostream& out, const String& str)
-{
-	out << str.c_str();
-	return out;
-}
-
-std::istream& operator>> (std::istream& in, String& str)
-{
-	char c;
-	while ((c = in.get()) != '\n')
-	{
-		str += c;
-	}
-
-	return in;
 }

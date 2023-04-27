@@ -31,10 +31,6 @@ public:
 	bool operator>(const String&) const;
 	String operator+(const String&) const;
 	String& operator+=(const String&);
-	String& operator+=(const char&);
-
-	friend std::istream& operator>>(std::istream&, String&);
-	friend std::ostream& operator<<(std::ostream&, const String&);
 
 	void print() const;
 };
