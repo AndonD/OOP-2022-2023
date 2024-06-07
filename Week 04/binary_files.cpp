@@ -137,7 +137,7 @@ int main()
 	// Writing the product "dynamic" to a binary file
 	// Pay attention to how we write the str data member
 	size_t nameLength = strlen(dynamic.name);					// or strlen(dynamic.name) + 1 if you want to write also the terminating null
-	binary.write((const char*)&nameLength, sizeof(nameLength));	// or sizeof(nameLength + 1) for terminating null
+	binary.write((const char*)&nameLength, sizeof(nameLength));
 	binary.write(dynamic.name, nameLength);	// note why we do not cast "dynamic.name" and why we don't use sizeof()
 	binary.write((const char*)&dynamic.quantity, sizeof(dynamic.quantity));
 	binary.write((const char*)&dynamic.price, sizeof(dynamic.price));
