@@ -1,5 +1,4 @@
-#pragma warning(disable:4996)
-
+#pragma warning(disable:4996)	// disabling warnings about using strcpy instead of strcpy_s
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -12,7 +11,7 @@ struct Product_With_Static_Array
 	size_t quantity;
 	float price;
 
-	void print()
+	void print() const
 	{
 		std::cout << name << std::endl;
 		std::cout << quantity << std::endl;
@@ -26,7 +25,22 @@ struct Product_With_Dynamic_Array
 	size_t quantity;
 	float price;
 
-	void print()
+	void print() const
+	{
+		std::cout << name << std::endl;
+		std::cout << quantity << std::endl;
+		std::cout << price << std::endl;
+	}
+};
+
+struct Product_With_String
+{
+	std::string name;
+	std::string note;
+	size_t quantity;
+	float price;
+
+	void print() const
 	{
 		std::cout << name << std::endl;
 		std::cout << quantity << std::endl;
@@ -39,25 +53,10 @@ int main()
 {
 	std::fstream binary;
 
-	// OPENING	!!!!!!!!!!!
-	// Here there was a problem when we tried opening it by using:
-	// 'binary.open("binary_files_demo.dat", std::ios::binary | std::ios::in'| std::ios::out)'
-	// The program would work only when there is such a file before running the program. It wasn't possible to create and open it
-	// if it haven't existed.
-	// 
-	// Turns out that it would work if we use ALSO the std::ios::app flag when trying to open it.
-	// There are many combinations of those possible flags and modes for opening a file. And there is
-	// a strictly known expected result for each of the combinations and it is written in this link:
-	// 
-	// https://en.cppreference.com/w/cpp/io/basic_filebuf/open
-	// 
-	// Also note that in every try to open a file, the opening mode is determined by
-	// (<a flag we write> | <a flag we write> | <and more flags we want etc.>) & std::ios::ate
-	//
-
-	// After reading the info above, we know that this line will create the file if it doesn't exist
-	binary.open("binary_files_demo.dat", std::ios::binary | std::ios::in | std::ios::app);
-	if (!binary.is_open())
+	// See here more info on opening files with different flags: https://en.cppreference.com/w/cpp/io/basic_filebuf/open
+	 
+	binary.open("binary_files_demo.dat", std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+	if (!binary)
 	{
 		std::cerr << ERROR_MESSAGE;
 		return -1;
@@ -67,7 +66,7 @@ int main()
 	Product_With_Static_Array product;
 	strcpy(product.name, name);
 	product.quantity = 5;
-	product.price = 2.45;
+	product.price = 2.45f;
 
 	char name2[10] = "apple 2";
 	Product_With_Static_Array product2;
@@ -81,8 +80,6 @@ int main()
 	product3.quantity = 7;
 	product3.price = 1;
 
-
-	std::cout << std::boolalpha << binary.eof() << std::endl;	// check again for any case the we are not in the end of the file
 
 	binary.write((const char*)&product, sizeof(Product_With_Static_Array));
 	binary.write((const char*)&product2, sizeof(Product_With_Static_Array));
@@ -105,7 +102,14 @@ int main()
 
 	Product_With_Static_Array productToTest;	// the object in which we will save the info from the file to test if it is the exact object in file we want
 
-	// We skip the first 2 Products in the file (because of 2*sizeof(Product_With_Static_Array)) by setting the streampos to the beginning of the third one
+	// seekg and tellg are used to set where in the file we want to start read/write
+	// Read more in the following links:
+	// https://www.geeksforgeeks.org/read-a-record-from-a-file-in-c-using-seekg-and-tellg/
+	// https://cplusplus.com/reference/istream/istream/tellg/
+	// https://cplusplus.com/reference/istream/istream/seekg/
+	
+	
+	// In order to read the 3rd Product we skip the first 2 Products in the file (because of 2*sizeof(Product_With_Static_Array)) by setting the streampos to the beginning of the third one
 	binary.seekg(2 * sizeof(Product_With_Static_Array), std::ios::beg);
 	binary.read((char*)&productToTest, sizeof(Product_With_Static_Array));	// Here the product we want is read and saved into 'productToTest'
 	if (!binary)
@@ -117,10 +121,10 @@ int main()
 	productToTest.print();
 	binary.close();
 
-	
+
 	// DYNAMIC ARRAYS
 
-	binary.open("binary_files_dynamic.dat", std::ios::binary | std::ios::in | std::ios::app);
+	binary.open("binary_files_dynamic.dat", std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
 	if (!binary.is_open())
 	{
 		std::cerr << ERROR_MESSAGE;
@@ -132,7 +136,7 @@ int main()
 	dynamic.name = new char[strlen(str) + 1];
 	strcpy(dynamic.name, str);
 	dynamic.quantity = 20;
-	dynamic.price = 2.20;
+	dynamic.price = 2.20f;
 
 	// Writing the product "dynamic" to a binary file
 	// Pay attention to how we write the str data member
@@ -151,6 +155,8 @@ int main()
 
 	// Reading
 	Product_With_Dynamic_Array toRead;
+	binary.seekg(0, std::ios::beg);	// returning the pointer in the file to the beginning
+
 	binary.read((char*)&nameLength, sizeof(nameLength));
 	toRead.name = new char[nameLength + 1];	// if we write the terminating null in the file, here would be nameLength (without +1)
 	binary.read(toRead.name, nameLength);
@@ -166,6 +172,70 @@ int main()
 
 	toRead.print();
 	delete[] toRead.name;	// free the memory used by "toRead"
+
+	binary.close();
+
+
+	// STRINGS
+
+	binary.open("binary_files_strings.dat", std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+	if (!binary.is_open())
+	{
+		std::cerr << ERROR_MESSAGE;
+		return -1;
+	}
+
+	Product_With_String strProd;
+	strProd.name = "cherry string";
+	strProd.quantity = 100;
+	strProd.price = 5.20f;
+
+	// Writing the product "strProd" to a binary file
+	
+	nameLength = strProd.name.size();					// or strProd.size() + 1 if you want to write also the terminating null
+	binary.write((const char*)&nameLength, sizeof(nameLength));
+	binary.write(strProd.name.c_str(), nameLength);	// note why we do not cast "strProd.name.c_str()" and why we don't use nameLength * sizeof()
+
+	size_t noteLength = strProd.note.size();
+	binary.write((const char*)&noteLength, sizeof(noteLength));
+	binary.write(strProd.note.c_str(), noteLength);
+	
+	binary.write((const char*)&strProd.quantity, sizeof(strProd.quantity));
+	binary.write((const char*)&strProd.price, sizeof(strProd.price));
+	if (!binary)
+	{
+		std::cerr << "Something went wrong when writing to the file\n";
+		// file stream error handling
+	}
+
+
+	// Reading
+	Product_With_String toRead2;
+	binary.seekg(0, std::ios::beg);
+
+	binary.read((char*)&nameLength, sizeof(nameLength));
+	char* buffer = new char[nameLength + 1];	// if we write the terminating null in the file, here would be nameLength (without +1)
+	binary.read(buffer, nameLength);
+	buffer[nameLength] = '\0';
+	toRead2.name = buffer;
+	delete[] buffer;
+
+	binary.read((char*)&noteLength, sizeof(noteLength));
+	buffer = new char[noteLength + 1];	// if we write the terminating null in the file, here would be nameLength (without +1)
+	binary.read(buffer, noteLength);
+	buffer[noteLength] = '\0';
+	toRead2.note = buffer;
+	delete[] buffer;
+
+	binary.read((char*)&toRead2.quantity, sizeof(toRead2.quantity));
+	binary.read((char*)&toRead2.price, sizeof(toRead2.price));
+	if (!binary)
+	{
+		std::cerr << "Something went wrong when writing to the file\n";
+		// file stream error handling
+	}
+
+	toRead2.print();
 
 	binary.close();
 
